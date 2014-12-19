@@ -16,7 +16,9 @@
 package org.codehaus.griffon.runtime.hibernate3;
 
 import griffon.core.Configuration;
+import griffon.core.addon.GriffonAddon;
 import griffon.core.injection.Module;
+import griffon.inject.DependsOn;
 import griffon.plugins.hibernate3.Hibernate3Factory;
 import griffon.plugins.hibernate3.Hibernate3Handler;
 import griffon.plugins.hibernate3.Hibernate3Storage;
@@ -32,6 +34,7 @@ import static griffon.util.AnnotationUtils.named;
 /**
  * @author Andres Almiray
  */
+@DependsOn("datasource")
 @Named("hibernate3")
 @ServiceProviderFor(Module.class)
 public class Hibernate3Module extends AbstractModule {
@@ -58,6 +61,10 @@ public class Hibernate3Module extends AbstractModule {
 
         bind(Hibernate3Handler.class)
             .to(DefaultHibernate3Handler.class)
+            .asSingleton();
+
+        bind(GriffonAddon.class)
+            .to(Hibernate3Addon.class)
             .asSingleton();
         // end::bindings[]
     }
