@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class Hibernate3Addon extends AbstractGriffonAddon {
     @Inject
     private Hibernate3Factory hibernate3Factory;
 
-    public void onBootstrapEnd(@Nonnull GriffonApplication application) {
+    public void onStartupStart(@Nonnull GriffonApplication application) {
         for (String sessionFactoryName : hibernate3Factory.getSessionFactoryNames()) {
             Map<String, Object> config = hibernate3Factory.getConfigurationFor(sessionFactoryName);
             if (getConfigValueAsBoolean(config, "connect_on_startup", false)) {
