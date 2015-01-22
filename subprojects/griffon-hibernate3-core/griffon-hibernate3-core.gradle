@@ -18,7 +18,7 @@ dependencies {
     }
     compile 'org.javassist:javassist:3.18.2-GA'
 
-    griffon 'org.codehaus.griffon.plugins:griffon-datasource-plugin:1.2.0'
+    griffon 'org.codehaus.griffon.plugins:griffon-datasource-plugin:1.1.0'
 
     testCompileOnly "org.codehaus.griffon:griffon-groovy-compile:${griffon.version}"
 
