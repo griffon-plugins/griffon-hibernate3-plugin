@@ -33,11 +33,11 @@ import static org.codehaus.griffon.compile.core.MethodDescriptor.types;
  */
 public interface Hibernate3AwareConstants extends BaseConstants {
     String SESSION_TYPE = "org.hibernate.Session";
-    String HIBERNATE4_HANDLER_TYPE = "griffon.plugins.hibernate3.Hibernate3Handler";
-    String HIBERNATE4_CALLBACK_TYPE = "griffon.plugins.hibernate3.Hibernate3Callback";
-    String RUNTIME_HIBERNATE4_EXCEPTION_TYPE = "griffon.plugins.hibernate3.exceptions.RuntimeHibernate3Exception";
-    String HIBERNATE4_HANDLER_PROPERTY = "hibernate3Handler";
-    String HIBERNATE4_HANDLER_FIELD_NAME = "this$" + HIBERNATE4_HANDLER_PROPERTY;
+    String HIBERNATE3_HANDLER_TYPE = "griffon.plugins.hibernate3.Hibernate3Handler";
+    String HIBERNATE3_CALLBACK_TYPE = "griffon.plugins.hibernate3.Hibernate3Callback";
+    String RUNTIME_HIBERNATE3_EXCEPTION_TYPE = "griffon.plugins.hibernate3.exceptions.RuntimeHibernate3Exception";
+    String HIBERNATE3_HANDLER_PROPERTY = "hibernate3Handler";
+    String HIBERNATE3_HANDLER_FIELD_NAME = "this$" + HIBERNATE3_HANDLER_PROPERTY;
 
     String METHOD_WITH_SESSION = "withHbm3Session";
     String METHOD_CLOSE_SESSION = "closeHbm3Session";
@@ -52,7 +52,7 @@ public interface Hibernate3AwareConstants extends BaseConstants {
         method(
             type(VOID),
             METHOD_CLOSE_SESSION,
-            args(annotatedType(types(type(JAVAX_ANNOTATION_NULLABLE)), JAVA_LANG_STRING))
+            args(annotatedType(types(type(JAVAX_ANNOTATION_NONNULL)), JAVA_LANG_STRING))
         ),
 
         annotatedMethod(
@@ -60,8 +60,8 @@ public interface Hibernate3AwareConstants extends BaseConstants {
             type(R),
             typeParams(R),
             METHOD_WITH_SESSION,
-            args(annotatedType(annotations(JAVAX_ANNOTATION_NONNULL), HIBERNATE4_CALLBACK_TYPE, R)),
-            throwing(type(RUNTIME_HIBERNATE4_EXCEPTION_TYPE))
+            args(annotatedType(annotations(JAVAX_ANNOTATION_NONNULL), HIBERNATE3_CALLBACK_TYPE, R)),
+            throwing(type(RUNTIME_HIBERNATE3_EXCEPTION_TYPE))
         ),
         annotatedMethod(
             types(type(JAVAX_ANNOTATION_NONNULL)),
@@ -70,8 +70,8 @@ public interface Hibernate3AwareConstants extends BaseConstants {
             METHOD_WITH_SESSION,
             args(
                 annotatedType(annotations(JAVAX_ANNOTATION_NONNULL), JAVA_LANG_STRING),
-                annotatedType(annotations(JAVAX_ANNOTATION_NONNULL), HIBERNATE4_CALLBACK_TYPE, R)),
-            throwing(type(RUNTIME_HIBERNATE4_EXCEPTION_TYPE))
+                annotatedType(annotations(JAVAX_ANNOTATION_NONNULL), HIBERNATE3_CALLBACK_TYPE, R)),
+            throwing(type(RUNTIME_HIBERNATE3_EXCEPTION_TYPE))
         )
     };
 }

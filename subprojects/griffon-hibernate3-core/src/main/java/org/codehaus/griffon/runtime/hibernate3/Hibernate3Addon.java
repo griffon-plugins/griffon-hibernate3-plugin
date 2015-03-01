@@ -16,11 +16,15 @@
 package org.codehaus.griffon.runtime.hibernate3;
 
 import griffon.core.GriffonApplication;
+import griffon.core.env.Metadata;
 import griffon.inject.DependsOn;
 import griffon.plugins.hibernate3.Hibernate3Callback;
 import griffon.plugins.hibernate3.Hibernate3Factory;
 import griffon.plugins.hibernate3.Hibernate3Handler;
+import griffon.plugins.hibernate3.Hibernate3Storage;
+import griffon.plugins.monitor.MBeanManager;
 import org.codehaus.griffon.runtime.core.addon.AbstractGriffonAddon;
+import org.codehaus.griffon.runtime.jmx.Hibernate3StorageMonitor;
 import org.hibernate.Session;
 
 import javax.annotation.Nonnull;
@@ -42,6 +46,20 @@ public class Hibernate3Addon extends AbstractGriffonAddon {
 
     @Inject
     private Hibernate3Factory hibernate3Factory;
+
+    @Inject
+    private Hibernate3Storage hibernate3Storage;
+
+    @Inject
+    private MBeanManager mbeanManager;
+
+    @Inject
+    private Metadata metadata;
+
+    @Override
+    public void init(@Nonnull GriffonApplication application) {
+        mbeanManager.registerMBean(new Hibernate3StorageMonitor(metadata, hibernate3Storage));
+    }
 
     public void onStartupStart(@Nonnull GriffonApplication application) {
         for (String sessionFactoryName : hibernate3Factory.getSessionFactoryNames()) {

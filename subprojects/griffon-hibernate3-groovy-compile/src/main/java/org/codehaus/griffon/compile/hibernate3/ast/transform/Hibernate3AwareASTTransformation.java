@@ -45,8 +45,8 @@ import static org.codehaus.griffon.compile.core.ast.GriffonASTUtils.injectInterf
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
 public class Hibernate3AwareASTTransformation extends AbstractASTTransformation implements Hibernate3AwareConstants, AnnotationHandler {
     private static final Logger LOG = LoggerFactory.getLogger(Hibernate3AwareASTTransformation.class);
-    private static final ClassNode HIBERNATE4_HANDLER_CNODE = makeClassSafe(Hibernate3Handler.class);
-    private static final ClassNode HIBERNATE4_AWARE_CNODE = makeClassSafe(Hibernate3Aware.class);
+    private static final ClassNode HIBERNATE3_HANDLER_CNODE = makeClassSafe(Hibernate3Handler.class);
+    private static final ClassNode HIBERNATE3_AWARE_CNODE = makeClassSafe(Hibernate3Aware.class);
 
     /**
      * Convenience method to see if an annotated node is {@code @Hibernate3Aware}.
@@ -56,7 +56,7 @@ public class Hibernate3AwareASTTransformation extends AbstractASTTransformation 
      */
     public static boolean hasHibernate3AwareAnnotation(AnnotatedNode node) {
         for (AnnotationNode annotation : node.getAnnotations()) {
-            if (HIBERNATE4_AWARE_CNODE.equals(annotation.getClassNode())) {
+            if (HIBERNATE3_AWARE_CNODE.equals(annotation.getClassNode())) {
                 return true;
             }
         }
@@ -75,8 +75,8 @@ public class Hibernate3AwareASTTransformation extends AbstractASTTransformation 
     }
 
     public static void addHibernate3HandlerIfNeeded(SourceUnit source, AnnotationNode annotationNode, ClassNode classNode) {
-        if (needsDelegate(classNode, source, METHODS, Hibernate3Aware.class.getSimpleName(), HIBERNATE4_HANDLER_TYPE)) {
-            LOG.debug("Injecting {} into {}", HIBERNATE4_HANDLER_TYPE, classNode.getName());
+        if (needsDelegate(classNode, source, METHODS, Hibernate3Aware.class.getSimpleName(), HIBERNATE3_HANDLER_TYPE)) {
+            LOG.debug("Injecting {} into {}", HIBERNATE3_HANDLER_TYPE, classNode.getName());
             apply(classNode);
         }
     }
@@ -87,8 +87,8 @@ public class Hibernate3AwareASTTransformation extends AbstractASTTransformation 
      * @param declaringClass the class to which we add the support field and methods
      */
     public static void apply(@Nonnull ClassNode declaringClass) {
-        injectInterface(declaringClass, HIBERNATE4_HANDLER_CNODE);
-        Expression hibernate3Handler = injectedField(declaringClass, HIBERNATE4_HANDLER_CNODE, HIBERNATE4_HANDLER_FIELD_NAME);
-        addDelegateMethods(declaringClass, HIBERNATE4_HANDLER_CNODE, hibernate3Handler);
+        injectInterface(declaringClass, HIBERNATE3_HANDLER_CNODE);
+        Expression hibernate3Handler = injectedField(declaringClass, HIBERNATE3_HANDLER_CNODE, HIBERNATE3_HANDLER_FIELD_NAME);
+        addDelegateMethods(declaringClass, HIBERNATE3_HANDLER_CNODE, hibernate3Handler);
     }
 }

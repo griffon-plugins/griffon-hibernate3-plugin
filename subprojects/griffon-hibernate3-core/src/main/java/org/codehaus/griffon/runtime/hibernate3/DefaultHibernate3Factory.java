@@ -16,14 +16,17 @@
 package org.codehaus.griffon.runtime.hibernate3;
 
 import griffon.core.GriffonApplication;
+import griffon.core.env.Metadata;
 import griffon.core.injection.Injector;
 import griffon.plugins.datasource.DataSourceFactory;
 import griffon.plugins.datasource.DataSourceStorage;
 import griffon.plugins.hibernate3.Hibernate3Bootstrap;
 import griffon.plugins.hibernate3.Hibernate3Factory;
+import griffon.plugins.monitor.MBeanManager;
 import griffon.util.CollectionUtils;
 import org.codehaus.griffon.runtime.core.storage.AbstractObjectFactory;
 import org.codehaus.griffon.runtime.hibernate3.internal.HibernateConfigurationHelper;
+import org.codehaus.griffon.runtime.jmx.SessionFactoryMonitor;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -37,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static griffon.util.ConfigUtils.getConfigValue;
+import static griffon.util.ConfigUtils.getConfigValueAsBoolean;
 import static griffon.util.GriffonNameUtils.requireNonBlank;
 import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
@@ -56,6 +60,13 @@ public class DefaultHibernate3Factory extends AbstractObjectFactory<SessionFacto
 
     @Inject
     private Injector injector;
+
+    @Inject
+    private MBeanManager mBeanManager;
+
+    @Inject
+    private Metadata metadata;
+
 
     @Inject
     public DefaultHibernate3Factory(@Nonnull @Named("hibernate3") griffon.core.Configuration configuration, @Nonnull GriffonApplication application) {
@@ -102,7 +113,15 @@ public class DefaultHibernate3Factory extends AbstractObjectFactory<SessionFacto
         Configuration configuration = createConfiguration(config, name);
         createSchema(name, config, configuration);
 
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
+        SessionFactory sessionFactory = new RecordingSessionFactory(configuration.buildSessionFactory());
+
+
+        if (getConfigValueAsBoolean(config, "jmx", true)) {
+            sessionFactory = new JMXAwareSessionFactory(sessionFactory);
+            registerMBeans(name, (JMXAwareSessionFactory) sessionFactory);
+        }
+
+
         Session session = null;
         try {
             session = openSession(name, sessionFactory);
@@ -139,7 +158,17 @@ public class DefaultHibernate3Factory extends AbstractObjectFactory<SessionFacto
 
         closeDataSource(name);
 
+        if (getConfigValueAsBoolean(config, "jmx", true)) {
+            ((JMXAwareSessionFactory) instance).disposeMBeans();
+        }
+
         event("Hibernate3DisconnectEnd", asList(name, config));
+    }
+
+    private void registerMBeans(@Nonnull String name, @Nonnull JMXAwareSessionFactory sessionFactory) {
+        RecordingSessionFactory recordingSessionFactory = (RecordingSessionFactory) sessionFactory.getDelegate();
+        SessionFactoryMonitor sessionFactoryMonitor = new SessionFactoryMonitor(metadata, recordingSessionFactory, name);
+        sessionFactory.addObjectName(mBeanManager.registerMBean(sessionFactoryMonitor, false).getCanonicalName());
     }
 
     @Nonnull
